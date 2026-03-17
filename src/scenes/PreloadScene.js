@@ -7,10 +7,10 @@ export default class PreloadScene extends Phaser.Scene {
 
   preload() {
     // Level data
-    this.load.json('level', 'assets/levels/AutoLayers_advanced_demo.ldtkl');
+    this.load.json('level', 'assets/levels/Your_typical_2D_platformer.ldtkl');
 
     // Tileset
-    this.load.image('tileset', 'assets/tileset/Cavernas_by_Adam_Saltsman.png');
+    this.load.image('tileset', 'assets/tileset/SunnyLand_by_Ansimuz-extended.png');
 
     // Player animations (Aseprite atlas format)
     this.load.atlas('player-idle', 'assets/sprites/player/player-Idle.png', 'assets/sprites/player/player-Idle.json');

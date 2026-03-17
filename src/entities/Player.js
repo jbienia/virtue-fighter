@@ -17,7 +17,11 @@ export default class Player {
       up:    Phaser.Input.Keyboard.KeyCodes.W,
       left:  Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
+      down:  Phaser.Input.Keyboard.KeyCodes.S,
     });
+
+    this._touchingLadder = false;
+    this._climbingLadder = false;
   }
 
   _registerAnims(scene) {
@@ -64,8 +68,35 @@ export default class Player {
 
     const goLeft  = cursors.left.isDown  || wasd.left.isDown;
     const goRight = cursors.right.isDown || wasd.right.isDown;
+    const goUp    = cursors.up.isDown    || wasd.up.isDown;
+    const goDown  = cursors.down.isDown  || wasd.down.isDown;
     const jump    = Phaser.Input.Keyboard.JustDown(cursors.up) ||
                     Phaser.Input.Keyboard.JustDown(wasd.up);
+
+    // Consume the ladder touch flag set by the scene overlap
+    const touchingLadder   = this._touchingLadder;
+    this._touchingLadder   = false;
+
+    // Enter climb mode by pressing up/down on a ladder
+    if (touchingLadder && (goUp || goDown)) {
+      this._climbingLadder = true;
+    }
+    // Exit climb mode: jump, or walk sideways off the ladder
+    if (jump || ((goLeft || goRight) && !touchingLadder)) {
+      this._climbingLadder = false;
+    }
+
+    if (this._climbingLadder) {
+      sprite.body.allowGravity = false;
+      sprite.setVelocityX(0);
+      if (goUp)        sprite.setVelocityY(-120);
+      else if (goDown) sprite.setVelocityY(120);
+      else             sprite.setVelocityY(0);
+      sprite.play('idle', true);
+      return;
+    }
+
+    sprite.body.allowGravity = true;
 
     if (goLeft) {
       sprite.setVelocityX(-100);

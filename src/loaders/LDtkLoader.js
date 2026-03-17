@@ -4,11 +4,11 @@
  */
 export function parseLDtk(data) {
   const result = {
-    width:   data.pxWid,
-    height:  data.pxHei,
-    bgColor: data.__bgColor,
-    intGrid: null,
-    tiles:   [],
+    width:    data.pxWid,
+    height:   data.pxHei,
+    bgColor:  data.__bgColor,
+    intGrid:  null,
+    tileLayers: [],
     entities: {},
   };
 
@@ -20,11 +20,30 @@ export function parseLDtk(data) {
         cHei:     layer.__cHei,
         csv:      layer.intGridCsv,
       };
-      result.tiles = layer.autoLayerTiles;
+    }
 
-    } else if (layer.__type === 'Entities') {
+    // collect tiles from all auto-layer / intgrid layers that have tiles
+    if (layer.autoLayerTiles?.length) {
+      result.tileLayers.push({
+        tiles:    layer.autoLayerTiles,
+        gridSize: layer.__gridSize,
+      });
+    }
+
+    if (layer.__type === 'Entities') {
+      const gs = layer.__gridSize;
       for (const entity of layer.entityInstances) {
-        const id = entity.__identifier;
+        const id     = entity.__identifier;
+        const fields = {};
+        for (const f of entity.fieldInstances) {
+          fields[f.__identifier] = f.__value;
+        }
+
+        // patrol is an array of grid points → convert to pixel coords
+        const patrol = (fields.patrol ?? [])
+          .filter(Boolean)
+          .map(p => ({ x: p.cx * gs, y: p.cy * gs }));
+
         if (!result.entities[id]) result.entities[id] = [];
         result.entities[id].push({
           id,
@@ -33,6 +52,8 @@ export function parseLDtk(data) {
           y:      entity.px[1],
           width:  entity.width,
           height: entity.height,
+          fields,
+          patrol,
         });
       }
     }
