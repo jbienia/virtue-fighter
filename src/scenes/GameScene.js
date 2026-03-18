@@ -83,9 +83,11 @@ export default class GameScene extends Phaser.Scene {
       tiles.forEach(tile => {
         const key = `t_${tile.src[0]}_${tile.src[1]}`;
         if (!seenFrames.has(key)) {
+          // Adds a 'name' to the frame on the texture
           texture.add(key, 0, tile.src[0], tile.src[1], gridSize, gridSize);
           seenFrames.add(key);
         }
+        // Draws the frame at the specified location by looking up which frame to draw on the texture.
         rt.drawFrame('tileset', key, tile.px[0], tile.px[1]);
       });
     }
