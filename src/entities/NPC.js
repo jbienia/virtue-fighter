@@ -1,7 +1,7 @@
 const NPC_CONFIG = {
   ghost:  { frameCount: 4, bodyW: 14, bodyH: 30, offsetX: 8,  offsetY: 0 },
   spider: { frameCount: 4, bodyW: 20, bodyH: 21, offsetX: 5,  offsetY: 0 },
-  thing:  { frameCount: 4, bodyW: 10, bodyH: 45, offsetX: 12, offsetY: 0 },
+  thing:  { frameCount: 4, bodyW: 15, bodyH: 45, offsetX: 12, offsetY: 0 },
 };
 
 const PATROL_SPEED = 60;
@@ -38,12 +38,14 @@ export default class NPC {
       this._waypointIndex = 1;
       this._waypointDir   = 1;
     }
+
+    this._initFrames = 20;
   }
 
   _moveToward(target) {
     const dx = target.x - this.sprite.x;
     this.sprite.setVelocityX(dx >= 0 ? PATROL_SPEED : -PATROL_SPEED);
-    this.sprite.setFlipX(dx < 0);
+    this.sprite.setFlipX(dx >= 0);
   }
 
   update() {
@@ -53,8 +55,11 @@ export default class NPC {
     const target = this._waypoints[this._waypointIndex];
     const dist   = Math.abs(this.sprite.x - target.x);
 
-    const hitWall = (body.velocity.x > 0 && body.blocked.right) ||
-                    (body.velocity.x < 0 && body.blocked.left);
+    if (this._initFrames > 0) { this._initFrames--; this._moveToward(target); return; }
+
+    const movingRight = target.x > this.sprite.x;
+    const hitWall = (movingRight && body.blocked.right) ||
+                    (!movingRight && body.blocked.left);
 
     if (dist < 4 || hitWall) {
       this._waypointIndex += this._waypointDir;

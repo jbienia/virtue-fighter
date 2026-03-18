@@ -6,6 +6,8 @@ export function parseLDtk(data) {
   const result = {
     width:    data.pxWid,
     height:   data.pxHei,
+    worldX:   data.worldX ?? 0,
+    worldY:   data.worldY ?? 0,
     bgColor:  data.__bgColor,
     intGrid:  null,
     tileLayers: [],
@@ -25,8 +27,9 @@ export function parseLDtk(data) {
     // collect tiles from all auto-layer / intgrid layers that have tiles
     if (layer.autoLayerTiles?.length) {
       result.tileLayers.push({
-        tiles:    layer.autoLayerTiles,
-        gridSize: layer.__gridSize,
+        tiles:     layer.autoLayerTiles,
+        gridSize:  layer.__gridSize,
+        isIntGrid: layer.__type === 'IntGrid',
       });
     }
 
@@ -58,6 +61,9 @@ export function parseLDtk(data) {
       }
     }
   }
+
+  // IntGrid layers hold the foreground collision tiles and must render on top
+  result.tileLayers.sort((a, b) => (a.isIntGrid ? 1 : 0) - (b.isIntGrid ? 1 : 0));
 
   return result;
 }

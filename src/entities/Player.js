@@ -88,7 +88,15 @@ export default class Player {
 
     if (this._climbingLadder) {
       sprite.body.allowGravity = false;
-      sprite.setVelocityX(0);
+      if (goLeft) {
+        sprite.setVelocityX(-100);
+        sprite.setFlipX(true);
+      } else if (goRight) {
+        sprite.setVelocityX(100);
+        sprite.setFlipX(false);
+      } else {
+        sprite.setVelocityX(0);
+      }
       if (goUp)        sprite.setVelocityY(-120);
       else if (goDown) sprite.setVelocityY(120);
       else             sprite.setVelocityY(0);

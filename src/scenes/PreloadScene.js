@@ -7,7 +7,10 @@ export default class PreloadScene extends Phaser.Scene {
 
   preload() {
     // Level data
-    this.load.json('level', 'assets/levels/Your_typical_2D_platformer.ldtkl');
+    this.load.json('level-main',   'assets/levels/Your_typical_2D_platformer.ldtkl');
+    this.load.json('level-top',    'assets/levels/Top.ldtkl');
+    this.load.json('level-bottom', 'assets/levels/Bottom.ldtkl');
+    this.load.json('level-right',  'assets/levels/World_Level_3.ldtkl');
 
     // Tileset
     this.load.image('tileset', 'assets/tileset/SunnyLand_by_Ansimuz-extended.png');
