@@ -40,6 +40,24 @@ export default class NPC {
     }
 
     this._initFrames = 20;
+    this.health = 3;
+  }
+
+  hit() {
+    this.health -= 1;
+    if (this.health <= 0) {
+      this._dead = true;
+      this.scene.sound.play('death');
+      this.sprite.destroy();
+    } else {
+      // Flash white to indicate a hit
+      this.scene.tweens.add({
+        targets: this.sprite,
+        alpha: 0.2,
+        duration: 60,
+        yoyo: true,
+      });
+    }
   }
 
   _moveToward(target) {
@@ -49,7 +67,7 @@ export default class NPC {
   }
 
   update() {
-    if (!this._waypoints) return;
+    if (this._dead || !this._waypoints) return;
 
     const { body } = this.sprite;
     const target = this._waypoints[this._waypointIndex];

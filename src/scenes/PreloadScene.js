@@ -21,6 +21,10 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.atlas('player-jump', 'assets/sprites/player/player-Jump.png', 'assets/sprites/player/player-Jump.json');
     this.load.atlas('player-fall', 'assets/sprites/player/player-Fall.png', 'assets/sprites/player/player-Fall.json');
 
+    // Audio
+    this.load.audio('shoot', 'assets/audio/ezra.mp3');
+    this.load.audio('death', 'assets/audio/death-sound.mp3');
+
     // NPC spritesheets
     this.load.spritesheet('ghost',  'assets/sprites/npcs/ghost.png',  { frameWidth: 31, frameHeight: 44 });
     this.load.spritesheet('spider', 'assets/sprites/npcs/spider.png', { frameWidth: 32, frameHeight: 21 });
