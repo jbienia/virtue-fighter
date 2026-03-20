@@ -1,0 +1,10 @@
+{
+  "achilleshr.runonsave": {
+    "commands": [
+      {
+        "match": "\\.ldtkl$",
+        "cmd": "node ${workspaceFolder}/scripts/format-levels.js"
+      }
+    ]
+  }
+}
