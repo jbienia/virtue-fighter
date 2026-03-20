@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 
 export default class Player {
-  constructor(scene, x, y) {
+  constructor(scene, x, y, projectiles) {
     this.scene = scene;
+    this.projectiles = projectiles;
 
     this.sprite = scene.physics.add.sprite(x, y, 'player-idle', 'player #Idle 0.ase');
     this.sprite.setCollideWorldBounds(true);
@@ -21,9 +22,21 @@ export default class Player {
       right: Phaser.Input.Keyboard.KeyCodes.D,
       down:  Phaser.Input.Keyboard.KeyCodes.S,
     });
+    this.spaceBar = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     this._touchingLadder = false;
     this._climbingLadder = false;
+    this._shootCooldown  = 0;
+  }
+
+  _shoot() {
+    const bullet = this.projectiles.get();
+    if (!bullet) return;
+    bullet.enableBody(true, this.sprite.x, this.sprite.y, true, true);
+    bullet.body.allowGravity = false;
+    const vx = this.sprite.flipX ? -400 : 400;
+    bullet.setVelocity(vx, 0);
+    this.scene.sound.play('shoot');
   }
 
   _registerAnims(scene) {
@@ -68,6 +81,12 @@ export default class Player {
     const { sprite, cursors, wasd } = this;
     const onGround = sprite.body.blocked.down;
 
+    if (this._shootCooldown > 0) this._shootCooldown--;
+    if (Phaser.Input.Keyboard.JustDown(this.spaceBar) && this._shootCooldown === 0) {
+      this._shoot();
+      this._shootCooldown = 15;
+    }
+
     const goLeft  = cursors.left.isDown  || wasd.left.isDown;
     const goRight = cursors.right.isDown || wasd.right.isDown;
     const goUp    = cursors.up.isDown    || wasd.up.isDown;
@@ -83,8 +102,8 @@ export default class Player {
     if (touchingLadder && (goUp || goDown)) {
       this._climbingLadder = true;
     }
-    // Exit climb mode: jump, or walk sideways off the ladder
-    if (jump || ((goLeft || goRight) && !touchingLadder)) {
+    // Exit climb mode: jump, walk sideways off the ladder, or reach the top/bottom
+    if (jump || ((goLeft || goRight) && !touchingLadder) || (this._climbingLadder && !touchingLadder)) {
       this._climbingLadder = false;
     }
 
@@ -119,7 +138,7 @@ export default class Player {
     }
 
     if (jump && onGround) {
-      sprite.setVelocityY(-260);
+      sprite.setVelocityY(-200);
     }
 
     // Animation state
